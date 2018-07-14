@@ -5,57 +5,87 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rsibiet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/01 17:54:21 by rsibiet           #+#    #+#             */
-/*   Updated: 2016/02/15 19:58:30 by rsibiet          ###   ########.fr       */
+/*   Created: 2016/03/07 13:41:42 by rsibiet           #+#    #+#             */
+/*   Updated: 2016/03/07 13:47:35 by rsibiet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include "libft.h"
 
-static int	ft_read_line(int const fd, char *sav_fd[fd])
+static char		*ft_strcdup(const char *s, char c)
 {
-	char		*pos;
-	char		*temp;
-	int			i;
-	char		buff[BUFF_SIZE + 1];
+	char	*sout;
+	int		i;
 
+	if (s == NULL)
+		return (NULL);
 	i = 0;
-	while ((!(pos = ft_strchr(sav_fd[fd], '\n'))) &&
-			((i = read(fd, buff, BUFF_SIZE)) > 0))
+	while (s[i] && s[i] != c)
+		i++;
+	if (!(sout = (char *)malloc(++i * sizeof(char))))
+		return (NULL);
+	i = 0;
+	while (s[i] && s[i] != c)
 	{
-		buff[i] = '\0';
-		temp = sav_fd[fd];
-		sav_fd[fd] = ft_strjoin(temp, buff);
-		ft_strdel(&temp);
+		sout[i] = s[i];
+		i++;
 	}
-	if (i == -1)
-		return (-1);
-	if (i == 0 && pos == NULL)
+	sout[i] = 0;
+	return (sout);
+}
+
+static int		gnl_copy(char **line, char *str, int ret)
+{
+	int		len;
+
+	if (ft_strchr(str, '\n'))
+	{
+		*line = ft_strcdup(str, '\n');
+		len = ft_strlen(*line);
+		ft_memmove(str, str + len + 1, ft_strlen(str) - len);
+	}
+	else if (ret == 0)
+	{
+		*line = ft_strdup(str);
+		if (str)
+			ft_strdel(&str);
+		return (1);
+	}
+	if (str == NULL && ret <= 0)
 		return (0);
 	return (1);
 }
 
-int			get_next_line(int const fd, char **line)
+static int		gnl_read(int fd, char **str)
 {
-	static char		*sav_fd[256] = {NULL};
-	int				i;
+	char		buf[BUFF_SIZE + 1];
+	int			ret;
+	char		*tmp;
 
-	if (line == NULL || fd < 0 || fd > 255)
-		return (-1);
-	if (sav_fd[fd] == NULL)
-		sav_fd[fd] = ft_strdup("");
-	if ((i = ft_read_line(fd, sav_fd)) == 0)
+	while (!ft_strchr(*str, '\n') && (ret = read(fd, buf, BUFF_SIZE)) >= 1)
 	{
-		*line = sav_fd[fd];
-		if (ft_strlen(sav_fd[fd]) == 0)
-			return (0);
-		sav_fd[fd] = NULL;
-		return (1);
+		buf[ret] = 0;
+		tmp = *str;
+		*str = ft_strjoin(tmp, buf);
+		free(tmp);
 	}
-	else if (i == -1)
+	return (ret);
+}
+
+int				get_next_line(int const fd, char **line)
+{
+	static char			*str;
+	int					ret;
+
+	if (str == NULL)
+		str = ft_strnew(0);
+	ret = gnl_read(fd, &str);
+	if (ret == -1)
 		return (-1);
-	*line = ft_strsub(sav_fd[fd], 0, (ft_strchr(sav_fd[fd], '\n'))
-			- sav_fd[fd]);
-	sav_fd[fd] = ft_strdup(ft_strchr(sav_fd[fd], '\n') + 1);
-	return (1);
+	else if (ret == 0 && *str == 0)
+		return (0);
+	else
+		return (gnl_copy(line, str, ret));
 }

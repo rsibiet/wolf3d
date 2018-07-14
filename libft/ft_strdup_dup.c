@@ -6,11 +6,12 @@
 /*   By: rsibiet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/04 17:20:15 by rsibiet           #+#    #+#             */
-/*   Updated: 2016/02/10 18:43:04 by rsibiet          ###   ########.fr       */
+/*   Updated: 2016/03/07 13:44:01 by rsibiet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdlib.h>
 
 char	**ft_strdup_dup(char **c)
 {

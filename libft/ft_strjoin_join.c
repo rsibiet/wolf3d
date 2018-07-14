@@ -6,11 +6,12 @@
 /*   By: rsibiet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/04 17:36:54 by rsibiet           #+#    #+#             */
-/*   Updated: 2016/02/04 17:43:09 by rsibiet          ###   ########.fr       */
+/*   Updated: 2016/03/07 13:45:08 by rsibiet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdlib.h>
 
 char	**ft_strjoin_join(char **s, char *c)
 {
